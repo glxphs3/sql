@@ -2,13 +2,15 @@ import streamlit as st
 from code_editor import code_editor
 import sqlite3
 import pandas as pd
-import os
 
 st.set_page_config(page_title="SQL", layout="wide")
 
-# Initialize SQLite database
-db_file = 'database.db'
-conn = sqlite3.connect(db_file, check_same_thread=False)
+# Initialize SQLite in-memory database
+@st.cache_resource
+def get_connection():
+    return sqlite3.connect(':memory:', check_same_thread=False)
+
+conn = get_connection()
 cursor = conn.cursor()
 
 # Function to execute SQL commands
@@ -90,6 +92,3 @@ with right_column:
         st.write(table)
         data = fetch_table_data(table)
         st.dataframe(data)
-
-# Close the database connection when the app is done
-conn.close()
